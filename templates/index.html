@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+
+        .chat-container {
+            width: 350px;
+            height: 500px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin-right: 5px;
+        }
+
+        .chat-input button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            Chatbot
+        </div>
+        <div class="chat-messages">
+            <!-- Les messages du chat s'afficheront ici -->
+        </div>
+        <div class="chat-input">
+            <input type="text" placeholder="Tapez votre message ici...">
+            <button>Envoyer</button>
+        </div>
+    </div>
+
+    <script>
+        document.querySelector('.chat-input button').addEventListener('click', function () {
+            var inputElement = document.querySelector('.chat-input input');
+            var message = inputElement.value;
+            inputElement.value = ''; // Clear input after sending
+            if (message) {
+                // Display user message immediately
+                var chatMessages = document.querySelector('.chat-messages');
+                var userMessageDiv = document.createElement('div');
+                userMessageDiv.textContent = "Vous: " + message;
+                chatMessages.appendChild(userMessageDiv);
+
+                // Send message to Python backend
+                fetch('/ask', {
+                    method: 'POST',
+                    body: new URLSearchParams('message=' + message),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Display bot response
+                        var botMessageDiv = document.createElement('div');
+                        botMessageDiv.textContent = "Bot: " + data.message;
+                        chatMessages.appendChild(botMessageDiv);
+                    });
+            }
+        });
+    </script>
+
+</body>
+
+</html>
